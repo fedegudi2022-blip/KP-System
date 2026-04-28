@@ -23,7 +23,7 @@ export const ayudaCommand = {
 
     for (const category of categories) {
       const list = grouped[category]
-        .map(entry => `• \\`${entry.usage}\\` — ${entry.description}`)
+        .map(entry => `• \`${entry.usage}\` — ${entry.description}`)
         .join('\n');
 
       embed.addFields({ name: category, value: list, inline: false });

@@ -59,8 +59,10 @@ export const warnCommand = {
 
     const logEmbed = createAuditEmbed('warn', {
       description: `**${user.tag}** recibió una advertencia por **${interaction.user.tag}**.`,
+      target: `${user.tag} (${user.id})`,
+      moderator: `${interaction.user.tag} (${interaction.user.id})`,
+      reason,
       fields: [
-        { name: 'Razón', value: reason, inline: false },
         { name: 'Advertencias totales', value: `${warns.length}`, inline: true }
       ]
     });
@@ -73,7 +75,10 @@ export const warnCommand = {
           await member.timeout(15 * 60 * 1000, 'Auto-mute por múltiples advertencias');
           const autoMuteEmbed = createAuditEmbed('mute', {
             description: `**${user.tag}** fue silenciado automáticamente tras ${warns.length} advertencias.`,
-            fields: [{ name: 'Duración', value: '15 minutos', inline: true }]
+            target: `${user.tag} (${user.id})`,
+            moderator: `${interaction.user.tag} (${interaction.user.id})`,
+            duration: '15 minutos',
+            reason: 'Auto-mute por múltiples advertencias'
           });
           await sendLogMessage(interaction.guild, autoMuteEmbed);
         } catch (error) {

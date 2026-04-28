@@ -39,7 +39,7 @@ Proyecto de bot de Discord listo para usar en Visual Studio Code con `Node.js 24
 - `/warn` - Advierte a un usuario
 - `/infractions` - Muestra las infracciones de un usuario
 - `/clearwarns` - Limpia las advertencias de un usuario
-- `/setlog` - Configura el canal de logs
+- `/setlog` - Configura el canal de logs (banea, desbanea, expulsa, silencia, desilencia, advierte y limpia advertencias)
 
 ### 🎲 Diversión
 - `/dado` - Lanza un dado

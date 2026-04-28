@@ -11,10 +11,11 @@ const LOG_TEMPLATES = {
   unmute: { title: 'Silencio Quitado', color: 0x16a34a, emoji: '🔊' },
   join: { title: 'Usuario Entró', color: 0x10b981, emoji: '➡️' },
   leave: { title: 'Usuario Salió', color: 0xef4444, emoji: '⬅️' },
-  setlog: { title: 'Canal de Logs Configurado', color: 0x2563eb, emoji: '📌' }
+  setlog: { title: 'Canal de Logs Configurado', color: 0x2563eb, emoji: '📌' },
+  clearwarns: { title: 'Advertencias Eliminadas', color: 0x2563eb, emoji: '🧹' }
 };
 
-export function createAuditEmbed(type, options) {
+export function createAuditEmbed(type, options = {}) {
   const template = LOG_TEMPLATES[type] ?? { title: 'Evento', color: config.embedColor, emoji: 'ℹ️' };
   const embed = new EmbedBuilder()
     .setTitle(`${template.emoji} ${template.title}`)
@@ -22,9 +23,20 @@ export function createAuditEmbed(type, options) {
     .setTimestamp()
     .setFooter({ text: 'Registro de eventos' });
 
+  if (options.author) {
+    embed.setAuthor({ name: options.author, iconURL: options.authorIcon });
+  }
+
   if (options.description) embed.setDescription(options.description);
   if (options.thumbnail) embed.setThumbnail(options.thumbnail);
-  if (options.fields) embed.addFields(options.fields);
+
+  const fields = [];
+  if (options.target) fields.push({ name: 'Usuario', value: options.target, inline: true });
+  if (options.moderator) fields.push({ name: 'Moderador', value: options.moderator, inline: true });
+  if (options.duration) fields.push({ name: 'Duración', value: options.duration, inline: true });
+  if (options.reason) fields.push({ name: 'Razón', value: options.reason, inline: false });
+  if (Array.isArray(options.fields)) fields.push(...options.fields);
+  if (fields.length) embed.addFields(fields);
 
   return embed;
 }

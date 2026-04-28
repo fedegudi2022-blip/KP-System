@@ -56,7 +56,9 @@ export const unmuteCommand = {
 
       const logEmbed = createAuditEmbed('unmute', {
         description: `**${user.tag}** recuperó su permiso de hablar por **${interaction.user.tag}**.`,
-        fields: [{ name: 'Razón', value: 'Silencio removido', inline: false }]
+        target: `${user.tag} (${user.id})`,
+        moderator: `${interaction.user.tag} (${interaction.user.id})`,
+        reason: 'Silencio removido'
       });
       await sendLogMessage(interaction.guild, logEmbed);
     } catch (error) {

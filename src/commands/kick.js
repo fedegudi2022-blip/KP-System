@@ -67,7 +67,9 @@ export const kickCommand = {
 
       const logEmbed = createAuditEmbed('kick', {
         description: `**${user.tag}** fue expulsado por **${interaction.user.tag}**.`,
-        fields: [{ name: 'Razón', value: reason, inline: false }]
+        target: `${user.tag} (${user.id})`,
+        moderator: `${interaction.user.tag} (${interaction.user.id})`,
+        reason
       });
       await sendLogMessage(interaction.guild, logEmbed);
     } catch (error) {

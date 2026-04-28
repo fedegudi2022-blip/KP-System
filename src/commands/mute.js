@@ -77,7 +77,10 @@ export const muteCommand = {
 
       const logEmbed = createAuditEmbed('mute', {
         description: `**${user.tag}** fue silenciado por **${interaction.user.tag}** durante **${minutes}** minutos.`,
-        fields: [{ name: 'Razón', value: reason, inline: false }]
+        target: `${user.tag} (${user.id})`,
+        moderator: `${interaction.user.tag} (${interaction.user.id})`,
+        duration: `${minutes} minutos`,
+        reason
       });
       await sendLogMessage(interaction.guild, logEmbed);
     } catch (error) {

@@ -14,12 +14,12 @@ export const config = {
 
   // Actividades del bot (se rotan automáticamente)
   activities: [
-    { text: process.env.BOT_STATUS ?? '/ayuda (conoceme)', type: 'Listening' },
-    { text: 'Viendo los mensajes!', type: 'Watching' },
-    { text: '/ping (para ver mi latencia)', type: 'Listening' },
+    { text: process.env.BOT_STATUS ?? '/ayuda para ver comandos', type: 'Listening' },
+    { text: 'Protegiendo a {guildCount} servidores', type: 'Watching' },
+    { text: 'Cuidando a {userCount} usuarios', type: 'Competing' },
   ],
 
-  // Cada cuántos ms rotar la actividad (5 minutos)
+  // Cada cuántos ms rotar la actividad
   activityInterval: 5 * 60 * 1000,
 
   defaultCooldown: Number(process.env.DEFAULT_COOLDOWN ?? 5),
@@ -34,6 +34,11 @@ export const config = {
     mentionTimeoutMinutes: 30,
     newMemberProtectionDays: 7,
     spamThreshold: 5,
-    spamInterval: 8 * 1000
+    spamInterval: 8 * 1000,
+    repeatMessageThreshold: 3,
+    repeatMessageWindowMs: 15 * 1000,
+    autoMuteThreshold: 3,
+    autoKickThreshold: 5,
+    autoBanThreshold: 7
   }
 };

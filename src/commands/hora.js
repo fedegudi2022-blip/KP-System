@@ -13,6 +13,10 @@ export const horaCommand = {
 
     const embed = buildEmbed(config, '🕐 Hora Actual')
       .setDescription(`**${formatted}**`)
+      .addFields(
+        { name: 'Zona horaria', value: `${config.timeZone}`, inline: true },
+        { name: 'Localización', value: `${config.locale}`, inline: true }
+      )
       .setFooter({ text: `Zona horaria: ${config.timeZone}` });
 
     await interaction.reply({ embeds: [embed] });

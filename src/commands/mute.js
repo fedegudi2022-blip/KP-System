@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
+import { requestConfirmation } from '../utils/confirmations.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const muteCommand = {
@@ -67,27 +68,37 @@ export const muteCommand = {
       return;
     }
 
-    const duration = minutes * 60 * 1000;
+    await requestConfirmation({
+      interaction,
+      config,
+      title: 'Confirmar silencio',
+      description: `¿Querés silenciar a **${user.tag}** por **${minutes}** minutos?`,
+      confirmLabel: 'Silenciar',
+      cancelLabel: 'Cancelar',
+      onConfirm: async () => {
+        try {
+          const duration = minutes * 60 * 1000;
+          await member.timeout(duration, reason);
 
-    try {
-      await member.timeout(duration, reason);
-      const embed = successEmbed(config, '🔇 Usuario Silenciado')
-        .setDescription(`**${user.tag}** ha sido silenciado por **${minutes}** minutos.`)
-        .addFields({ name: '📝 Razón', value: reason, inline: false });
+          const embed = successEmbed(config, '🔇 Usuario Silenciado')
+            .setDescription(`**${user.tag}** ha sido silenciado por **${minutes}** minutos.`)
+            .addFields({ name: '📝 Razón', value: reason, inline: false });
 
-      await interaction.reply({ embeds: [embed] });
+          await interaction.followUp({ embeds: [embed], ephemeral: true });
 
-      const logEmbed = createAuditEmbed('mute', {
-        description: `**${user.tag}** fue silenciado por **${interaction.user.tag}** durante **${minutes}** minutos.`,
-        target: `${user.tag} (${user.id})`,
-        moderator: `${interaction.user.tag} (${interaction.user.id})`,
-        duration: `${minutes} minutos`,
-        reason
-      });
-      await sendLogMessage(interaction.guild, logEmbed);
-    } catch (error) {
-      console.error('Error al silenciar:', error);
-      await interaction.reply({ embeds: [errorEmbed(config, 'Ocurrió un error al intentar silenciar al usuario.')], ephemeral: true });
-    }
+          const logEmbed = createAuditEmbed('mute', {
+            description: `**${user.tag}** fue silenciado por **${interaction.user.tag}** durante **${minutes}** minutos.`,
+            target: `${user.tag} (${user.id})`,
+            moderator: `${interaction.user.tag} (${interaction.user.id})`,
+            duration: `${minutes} minutos`,
+            reason
+          });
+          await sendLogMessage(interaction.guild, logEmbed);
+        } catch (error) {
+          console.error('Error al silenciar:', error);
+          await interaction.followUp({ embeds: [errorEmbed(config, 'Ocurrió un error al intentar silenciar al usuario.')], ephemeral: true });
+        }
+      }
+    });
   }
 };

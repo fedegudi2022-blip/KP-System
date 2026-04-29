@@ -16,7 +16,12 @@ export const avatarCommand = {
 
     const embed = buildEmbed(config, `🖼️ Avatar de ${user.username}`)
       .setDescription(`[Descargar avatar](${avatarUrl})`)
-      .setImage(avatarUrl);
+      .setImage(avatarUrl)
+      .addFields(
+        { name: 'Usuario', value: `${user}`, inline: true },
+        { name: 'Tag', value: `${user.tag}`, inline: true },
+        { name: 'ID', value: `${user.id}`, inline: true }
+      );
 
     await interaction.reply({ embeds: [embed] });
   }

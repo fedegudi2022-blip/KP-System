@@ -12,7 +12,15 @@ const LOG_TEMPLATES = {
   join: { title: 'Usuario Entró', color: 0x10b981, emoji: '➡️' },
   leave: { title: 'Usuario Salió', color: 0xef4444, emoji: '⬅️' },
   setlog: { title: 'Canal de Logs Configurado', color: 0x2563eb, emoji: '📌' },
-  clearwarns: { title: 'Advertencias Eliminadas', color: 0x2563eb, emoji: '🧹' }
+  clearwarns: { title: 'Advertencias Eliminadas', color: 0x2563eb, emoji: '🧹' },
+  messageDelete: { title: 'Mensaje Eliminado', color: 0xef4444, emoji: '🗑️' },
+  messageUpdate: { title: 'Mensaje Editado', color: 0xf59e0b, emoji: '✏️' },
+  roleCreate: { title: 'Rol Creado', color: 0x10b981, emoji: '🆕' },
+  roleDelete: { title: 'Rol Eliminado', color: 0xef4444, emoji: '❌' },
+  roleUpdate: { title: 'Rol Actualizado', color: 0x2563eb, emoji: '🔧' },
+  channelCreate: { title: 'Canal Creado', color: 0x10b981, emoji: '🆕' },
+  channelDelete: { title: 'Canal Eliminado', color: 0xef4444, emoji: '❌' },
+  nuke: { title: 'Nuke Ejecutado', color: 0xdc2626, emoji: '💣' }
 };
 
 export function createAuditEmbed(type, options = {}) {

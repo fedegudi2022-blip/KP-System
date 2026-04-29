@@ -1,7 +1,8 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
-import { buildEmbed, errorEmbed } from './helpers.js';
+import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
 
 export const limpiarCommand = {
+  permissions: ['ManageMessages'],
   data: new SlashCommandBuilder()
     .setName('limpiar')
     .setDescription('Borra mensajes recientes del canal.')
@@ -40,8 +41,7 @@ export const limpiarCommand = {
     const deleted = await interaction.channel.bulkDelete(amount, true);
     const deletedCount = deleted.size;
 
-    const embed = buildEmbed(config, '🗑️ Mensajes Eliminados')
-      .setDescription(`Se eliminaron **${deletedCount}** mensajes.`);
+    const embed = successEmbed(config, '🗑️ Mensajes Eliminados', `Se eliminaron **${deletedCount}** mensajes.`);
 
     await interaction.reply({ embeds: [embed] });
   }

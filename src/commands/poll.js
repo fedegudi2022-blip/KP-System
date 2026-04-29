@@ -1,5 +1,5 @@
-import { SlashCommandBuilder } from 'discord.js';
-import { buildEmbed, errorEmbed } from './helpers.js';
+import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { buildEmbed, errorEmbed, warningEmbed } from './helpers.js';
 
 const EMOJIS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣'];
 
@@ -56,8 +56,19 @@ export const pollCommand = {
       .setFooter({ text: 'Reacciona para votar' });
 
     const sent = await interaction.reply({ embeds: [embed], fetchReply: true });
+    const channelPermissions = sent.channel.permissionsFor(interaction.client.user);
+
+    if (!channelPermissions?.has(PermissionFlagsBits.AddReactions)) {
+      await interaction.followUp({ embeds: [warningEmbed(config, 'No puedo reaccionar en este canal. Los usuarios deberán votar manualmente.')], ephemeral: true });
+      return;
+    }
+
     for (let i = 0; i < options.length; i += 1) {
-      await sent.react(EMOJIS[i]);
+      try {
+        await sent.react(EMOJIS[i]);
+      } catch {
+        // Ignorar si no se puede reaccionar a una opción.
+      }
     }
   }
 };

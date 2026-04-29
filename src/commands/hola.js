@@ -15,8 +15,10 @@ export const holaCommand = {
     ];
     const text = greetings[Math.floor(Math.random() * greetings.length)];
 
-    const embed = successEmbed(config, '👋 ¡Hola!', text)
-      .setThumbnail(getAvatarUrl(interaction.user));
+    const embed = successEmbed(config, '👋 ¡Hola!')
+      .setDescription(text)
+      .setThumbnail(getAvatarUrl(interaction.user))
+      .setFooter({ text: 'Usa /ayuda para ver todos los comandos disponibles.' });
 
     await interaction.reply({ embeds: [embed] });
   }

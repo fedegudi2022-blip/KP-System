@@ -13,11 +13,21 @@ export const decirCommand = {
     ),
 
   async execute({ interaction }) {
-    const message = interaction.options.getString('mensaje');
-    const safeMessage = sanitizeText(message);
+    const message = (interaction.options.getString('mensaje') ?? '').trim();
 
-    if (!safeMessage || /@everyone|@here/i.test(message)) {
+    if (!message) {
+      await interaction.reply({ content: 'Debés escribir el mensaje que querés que diga el bot.', ephemeral: true });
+      return;
+    }
+
+    if (/@everyone|@here/i.test(message)) {
       await interaction.reply({ content: 'No se permiten menciones globales en este comando.', ephemeral: true });
+      return;
+    }
+
+    const safeMessage = sanitizeText(message);
+    if (!safeMessage) {
+      await interaction.reply({ content: 'Tu mensaje contiene contenido no válido. Por favor prueba con otro texto.', ephemeral: true });
       return;
     }
 

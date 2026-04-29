@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
+import { requestConfirmation } from '../utils/confirmations.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const kickCommand = {
@@ -59,24 +60,34 @@ export const kickCommand = {
       return;
     }
 
-    try {
-      await member.kick(reason);
-      const embed = successEmbed(config, '👢 Usuario Expulsado')
-        .setDescription(`**${user.tag}** ha sido expulsado del servidor.`)
-        .addFields({ name: '📝 Razón', value: reason, inline: false });
+    await requestConfirmation({
+      interaction,
+      config,
+      title: 'Confirmar expulsión',
+      description: `¿Querés expulsar a **${user.tag}**? Esta acción lo sacará del servidor.`,
+      confirmLabel: 'Expulsar',
+      cancelLabel: 'Cancelar',
+      onConfirm: async () => {
+        try {
+          await member.kick(reason);
+          const embed = successEmbed(config, '👢 Usuario Expulsado')
+            .setDescription(`**${user.tag}** ha sido expulsado del servidor.`)
+            .addFields({ name: '📝 Razón', value: reason, inline: false });
 
-      await interaction.reply({ embeds: [embed] });
+          await interaction.followUp({ embeds: [embed], ephemeral: true });
 
-      const logEmbed = createAuditEmbed('kick', {
-        description: `**${user.tag}** fue expulsado por **${interaction.user.tag}**.`,
-        target: `${user.tag} (${user.id})`,
-        moderator: `${interaction.user.tag} (${interaction.user.id})`,
-        reason
-      });
-      await sendLogMessage(interaction.guild, logEmbed);
-    } catch (error) {
-      console.error('Error al expulsar:', error);
-      await interaction.reply({ embeds: [errorEmbed(config, 'Ocurrió un error al intentar expulsar al usuario.')], ephemeral: true });
-    }
+          const logEmbed = createAuditEmbed('kick', {
+            description: `**${user.tag}** fue expulsado por **${interaction.user.tag}**.`,
+            target: `${user.tag} (${user.id})`,
+            moderator: `${interaction.user.tag} (${interaction.user.id})`,
+            reason
+          });
+          await sendLogMessage(interaction.guild, logEmbed);
+        } catch (error) {
+          console.error('Error al expulsar:', error);
+          await interaction.followUp({ embeds: [errorEmbed(config, 'Ocurrió un error al intentar expulsar al usuario.')], ephemeral: true });
+        }
+      }
+    });
   }
 };

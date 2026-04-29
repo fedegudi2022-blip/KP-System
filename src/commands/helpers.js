@@ -15,6 +15,14 @@ export function successEmbed(config, title, description) {
   return buildEmbed(config, title, description).setColor(config.successColor);
 }
 
+export function warningEmbed(config, title, description) {
+  return buildEmbed(config, title, description).setColor(config.warningColor ?? config.embedColor);
+}
+
+export function infoEmbed(config, title, description) {
+  return buildEmbed(config, title, description).setColor(config.infoColor ?? config.embedColor);
+}
+
 export function errorEmbed(config, description) {
   return new EmbedBuilder()
     .setColor(config.errorColor)
@@ -43,7 +51,10 @@ export function sanitizeText(text) {
   return text
     .replace(/@everyone/gi, 'everyone')
     .replace(/@here/gi, 'here')
+    .replace(/<@!?(\d+)>/g, '')
     .replace(/<@&\d+>/g, '')
+    .replace(/<#\d+>/g, '')
+    .replace(/<:[^:]+:\d+>/g, '')
     .trim();
 }
 

@@ -30,14 +30,16 @@ export const bola8Command = {
       { text: 'Las señales apuntan a que no.', icon: '🔴' }
     ];
 
-    const respuesta = respuestas[Math.floor(Math.random() * respuestas.length)];
     const question = interaction.options.getString('pregunta');
+    const respuesta = respuestas[Math.floor(Math.random() * respuestas.length)];
 
     const embed = buildEmbed(config, '🎱 Bola Mágica')
+      .setDescription('La bola mágica dijo...')
       .addFields(
-        { name: '❓ Tu pregunta', value: question, inline: false },
+        { name: '❓ Pregunta', value: question, inline: false },
         { name: '🔮 Respuesta', value: `${respuesta.icon} ${respuesta.text}`, inline: false }
-      );
+      )
+      .setFooter({ text: `Preguntado por ${interaction.user.tag}` });
 
     await interaction.reply({ embeds: [embed] });
   }

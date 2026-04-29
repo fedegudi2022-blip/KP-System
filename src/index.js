@@ -8,6 +8,7 @@ import { initializeDatabase } from './storage/database.js';
 import { validateCommandExecution } from './utils/command-guard.js';
 import { handleAutomodMessage } from './utils/automod.js';
 import { handleHelpInteraction } from './commands/ayuda.js';
+import { handleConfirmationInteraction } from './utils/confirmations.js';
 
 // ─── Validación del token ─────────────────────────────────────────────────────
 
@@ -127,10 +128,20 @@ const ACTIVITY_TYPE_MAP = {
 
 let activityIndex = 0;
 
-function setNextActivity(user) {
+function formatActivityText(text, client) {
+  const guildCount = client.guilds.cache.size;
+  const userCount = client.guilds.cache.reduce((sum, guild) => sum + (guild.memberCount ?? 0), 0);
+
+  return text
+    .replace(/{guildCount}/g, String(guildCount))
+    .replace(/{userCount}/g, String(userCount));
+}
+
+function setNextActivity(user, client) {
   try {
     const activity = config.activities[activityIndex % config.activities.length];
-    user.setActivity(activity.text, {
+    const name = formatActivityText(activity.text, client);
+    user.setActivity(name, {
       type: ACTIVITY_TYPE_MAP[activity.type] ?? ActivityType.Playing
     });
     activityIndex++;
@@ -158,11 +169,11 @@ client.once(Events.ClientReady, async (readyClient) => {
   await registerCommands();
 
   // Actividad inicial
-  setNextActivity(readyClient.user);
+  setNextActivity(readyClient.user, readyClient);
 
   // Rotación de actividades
   setInterval(() => {
-    setNextActivity(readyClient.user);
+    setNextActivity(readyClient.user, readyClient);
   }, config.activityInterval);
 
   console.log(`[BOT] ✅ Bot listo y disponible`);
@@ -171,13 +182,20 @@ client.once(Events.ClientReady, async (readyClient) => {
 // ─── Evento: InteractionCreate ────────────────────────────────────────────────
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (interaction.isButton() && interaction.customId.startsWith('help_')) {
+  if (interaction.isButton()) {
     try {
-      await handleHelpInteraction({ interaction, config, client });
+      if (interaction.customId.startsWith('help_')) {
+        await handleHelpInteraction({ interaction, config, client });
+        return;
+      }
+
+      if (interaction.customId.startsWith('confirm_action_')) {
+        await handleConfirmationInteraction(interaction, config);
+        return;
+      }
     } catch (error) {
-      console.error('[ERROR] Help button interaction:', error);
+      console.error('[ERROR] Button interaction:', error);
     }
-    return;
   }
 
   if (!interaction.isChatInputCommand()) return;
@@ -251,6 +269,87 @@ client.on(Events.GuildMemberRemove, async (member) => {
     fields: [{ name: 'Usuario', value: `<@${member.user.id}>`, inline: true }]
   });
   await sendLogMessage(member.guild, embed);
+});
+
+client.on(Events.MessageDelete, async (message) => {
+  if (!message.guild || message.author?.bot) return;
+  const embed = createAuditEmbed('messageDelete', {
+    description: `Se eliminó un mensaje de **${message.author.tag}** en ${message.channel}.`,
+    fields: [
+      { name: 'Canal', value: `${message.channel}`, inline: true },
+      { name: 'Autor', value: `${message.author.tag} (${message.author.id})`, inline: true },
+      { name: 'Contenido', value: message.content?.slice(0, 1024) || 'Sin contenido visible', inline: false }
+    ]
+  });
+  await sendLogMessage(message.guild, embed);
+});
+
+client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
+  if (!oldMessage.guild || oldMessage.author?.bot || !newMessage.content || oldMessage.content === newMessage.content) return;
+  const embed = createAuditEmbed('messageUpdate', {
+    description: `Un mensaje fue editado por **${oldMessage.author.tag}** en ${oldMessage.channel}.`,
+    fields: [
+      { name: 'Canal', value: `${oldMessage.channel}`, inline: true },
+      { name: 'Autor', value: `${oldMessage.author.tag} (${oldMessage.author.id})`, inline: true },
+      { name: 'Antes', value: oldMessage.content?.slice(0, 1024) || 'Sin contenido', inline: false },
+      { name: 'Después', value: newMessage.content?.slice(0, 1024) || 'Sin contenido', inline: false }
+    ]
+  });
+  await sendLogMessage(oldMessage.guild, embed);
+});
+
+client.on(Events.RoleCreate, async (role) => {
+  const embed = createAuditEmbed('roleCreate', {
+    description: `Se creó el rol **${role.name}**.`,
+    fields: [
+      { name: 'Rol', value: `${role}`, inline: true },
+      { name: 'Color', value: role.color ? `#${role.color.toString(16).padStart(6, '0')}` : 'Sin color', inline: true }
+    ]
+  });
+  await sendLogMessage(role.guild, embed);
+});
+
+client.on(Events.RoleDelete, async (role) => {
+  const embed = createAuditEmbed('roleDelete', {
+    description: `Se eliminó el rol **${role.name}**.`,
+    fields: [
+      { name: 'ID', value: role.id, inline: true }
+    ]
+  });
+  await sendLogMessage(role.guild, embed);
+});
+
+client.on(Events.RoleUpdate, async (oldRole, newRole) => {
+  const embed = createAuditEmbed('roleUpdate', {
+    description: `El rol **${oldRole.name}** fue actualizado.`,
+    fields: [
+      { name: 'Antes', value: `Nombre: ${oldRole.name}` + (oldRole.color !== newRole.color ? `, Color: ${oldRole.color}` : ''), inline: false },
+      { name: 'Después', value: `Nombre: ${newRole.name}` + (oldRole.color !== newRole.color ? `, Color: ${newRole.color}` : ''), inline: false }
+    ]
+  });
+  await sendLogMessage(oldRole.guild, embed);
+});
+
+client.on(Events.ChannelCreate, async (channel) => {
+  if (!channel.isTextBased()) return;
+  const embed = createAuditEmbed('channelCreate', {
+    description: `Se creó el canal ${channel}.`,
+    fields: [
+      { name: 'Tipo', value: `${channel.type}`, inline: true }
+    ]
+  });
+  await sendLogMessage(channel.guild, embed);
+});
+
+client.on(Events.ChannelDelete, async (channel) => {
+  if (!channel.guild) return;
+  const embed = createAuditEmbed('channelDelete', {
+    description: `Se eliminó el canal **${channel.name}**.`,
+    fields: [
+      { name: 'Tipo', value: `${channel.type}`, inline: true }
+    ]
+  });
+  await sendLogMessage(channel.guild, embed);
 });
 
 // ─── Manejo de errores ────────────────────────────────────────────────────────

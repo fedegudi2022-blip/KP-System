@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
-import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
+import { buildEmbed, errorEmbed, successEmbed, warningEmbed } from './helpers.js';
 import { addWarn, getWarns } from '../storage/warns.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
@@ -49,8 +49,7 @@ export const warnCommand = {
     const warn = await addWarn(interaction.guild.id, user.id, interaction.user.id, reason);
     const warns = await getWarns(interaction.guild.id, user.id);
 
-    const embed = successEmbed(config, '⚠️ Advertencia registrada')
-      .setDescription(`**${user.tag}** recibió una advertencia.`)
+    const embed = warningEmbed(config, '⚠️ Advertencia registrada', `**${user.tag}** recibió una advertencia.`)
       .addFields(
         { name: '📝 Razón', value: reason, inline: false },
         { name: '📌 Advertencias', value: `${warns.length}`, inline: true },

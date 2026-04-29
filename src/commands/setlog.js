@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, PermissionFlagsBits, ChannelType } from 'discord.js';
-import { buildEmbed, successEmbed } from './helpers.js';
+import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
 import { setLogChannelId } from '../storage/logChannels.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
@@ -17,18 +17,18 @@ export const setlogCommand = {
 
   async execute({ interaction, config }) {
     if (!interaction.guild || !interaction.member) {
-      await interaction.reply({ embeds: [buildEmbed(config, '❌ Error', 'Este comando solo funciona dentro de un servidor.')], ephemeral: true });
+      await interaction.reply({ embeds: [errorEmbed(config, 'Este comando solo funciona dentro de un servidor.')], ephemeral: true });
       return;
     }
 
     if (!interaction.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
-      await interaction.reply({ embeds: [buildEmbed(config, '❌ Permisos insuficientes', 'Necesitás el permiso `Manage Guild` para configurar el canal de logs.')], ephemeral: true });
+      await interaction.reply({ embeds: [errorEmbed(config, 'Necesitás el permiso `Manage Guild` para configurar el canal de logs.')], ephemeral: true });
       return;
     }
 
     const channel = interaction.options.getChannel('canal');
     if (!channel || channel.type !== ChannelType.GuildText) {
-      await interaction.reply({ embeds: [buildEmbed(config, '❌ Canal inválido', 'Seleccioná un canal de texto válido.')], ephemeral: true });
+      await interaction.reply({ embeds: [errorEmbed(config, 'Seleccioná un canal de texto válido.')], ephemeral: true });
       return;
     }
 

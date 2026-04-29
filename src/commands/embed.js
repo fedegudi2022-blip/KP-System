@@ -45,13 +45,22 @@ export const embedCommand = {
     const thumbnail = interaction.options.getString('miniatura');
 
     const sanitizedTitle = sanitizeText(title);
-    const sanitizedSubtitle = subtitle ? sanitizeText(subtitle) : '\u200b';
+    if (!sanitizedTitle) {
+      await interaction.reply({ embeds: [errorEmbed(config, 'El título no puede quedar vacío.')], ephemeral: true });
+      return;
+    }
+
+    const sanitizedSubtitle = subtitle ? sanitizeText(subtitle) : null;
+    const sanitizedFooter = footer ? sanitizeText(footer) : null;
 
     const embed = new EmbedBuilder()
       .setTitle(sanitizedTitle)
-      .setDescription(sanitizedSubtitle)
       .setColor(config.embedColor)
       .setTimestamp();
+
+    if (sanitizedSubtitle) {
+      embed.setDescription(sanitizedSubtitle);
+    }
 
     if (url) {
       if (!isValidUrl(url)) {
@@ -61,7 +70,10 @@ export const embedCommand = {
       embed.setURL(url);
     }
 
-    if (footer) embed.setFooter({ text: sanitizeText(footer) });
+    if (sanitizedFooter) {
+      embed.setFooter({ text: sanitizedFooter });
+    }
+
     if (image) {
       if (!isValidUrl(image)) {
         await interaction.reply({ embeds: [errorEmbed(config, 'URL de imagen inválida.')], ephemeral: true });
@@ -69,6 +81,7 @@ export const embedCommand = {
       }
       embed.setImage(image);
     }
+
     if (thumbnail) {
       if (!isValidUrl(thumbnail)) {
         await interaction.reply({ embeds: [errorEmbed(config, 'URL de miniatura inválida.')], ephemeral: true });

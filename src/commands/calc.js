@@ -12,9 +12,9 @@ export const calcCommand = {
     ),
 
   async execute({ interaction, config }) {
-    const expr = interaction.options.getString('expresion');
+    const expr = (interaction.options.getString('expresion') ?? '').trim();
 
-    if (!/^[\d\s\+\-\*\/\(\)\.\%\^]+$/.test(expr)) {
+    if (!expr || expr.length > 120 || !/^[\d\s\+\-\*\/\(\)\.\%\^]+$/.test(expr)) {
       await interaction.reply({ embeds: [errorEmbed(config, 'Expresión no válida. Solo se permiten números y operadores básicos (`+ - * / % ( ) ^`).')], ephemeral: true });
       return;
     }
@@ -29,10 +29,11 @@ export const calcCommand = {
       return;
     }
 
+    const displayed = Number(result.toFixed(8)).toString();
     const embed = successEmbed(config, '🧮 Calculadora')
       .addFields(
-        { name: '📥 Expresión', value: `\`${expr}\``, inline: true },
-        { name: '📤 Resultado', value: `\`${Number(result.toFixed(8))}\``, inline: true }
+        { name: '📥 Expresión', value: `\`${expr}\``, inline: false },
+        { name: '📤 Resultado', value: `\`${displayed}\``, inline: false }
       );
 
     await interaction.reply({ embeds: [embed] });

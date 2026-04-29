@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { buildEmbed } from './helpers.js';
+import { successEmbed } from './helpers.js';
 
 export const dadoCommand = {
   data: new SlashCommandBuilder()
@@ -18,11 +18,11 @@ export const dadoCommand = {
     const isMax = result === sides;
     const isMin = result === 1;
     const icon = isMax ? '⭐' : isMin ? '💀' : '🎲';
-    const comment = isMax ? '\n¡Número máximo!' : isMin ? '\n¡Número mínimo!' : '';
+    const comment = isMax ? '\n¡Número máximo!' : isMin ? '\n¡Número mínimo!' : ' ';
 
-    const embed = buildEmbed(config, `${icon} Dado d${sides}`)
+    const embed = successEmbed(config, `${icon} Dado d${sides}`)
       .setDescription(`Resultado: **${result}**${comment}`)
-      .setFooter({ text: `Rango posible: 1 – ${sides}` });
+      .setFooter({ text: `Rango: 1 - ${sides}` });
 
     await interaction.reply({ embeds: [embed] });
   }

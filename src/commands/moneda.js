@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { buildEmbed } from './helpers.js';
+import { successEmbed } from './helpers.js';
 
 export const monedaCommand = {
   data: new SlashCommandBuilder()
@@ -11,8 +11,9 @@ export const monedaCommand = {
     const result = isCara ? 'Cara' : 'Cruz';
     const icon = isCara ? '🟡' : '⚪';
 
-    const embed = buildEmbed(config, '🪙 Lanzamiento de Moneda')
-      .setDescription(`${icon} La moneda cayó en **${result}**.`);
+    const embed = successEmbed(config, '🪙 Lanzamiento de Moneda')
+      .setDescription(`${icon} La moneda cayó en **${result}**.`)
+      .setFooter({ text: `Lanzado por ${interaction.user.tag}` });
 
     await interaction.reply({ embeds: [embed] });
   }

@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
+import { requestConfirmation } from '../utils/confirmations.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const banCommand = {
@@ -54,24 +55,34 @@ export const banCommand = {
       return;
     }
 
-    try {
-      await interaction.guild.members.ban(user, { reason });
-      const embed = successEmbed(config, '🔨 Usuario Baneado')
-        .setDescription(`**${user.tag}** ha sido baneado del servidor.`)
-        .addFields({ name: '📝 Razón', value: reason, inline: false });
+    await requestConfirmation({
+      interaction,
+      config,
+      title: 'Confirmar baneo',
+      description: `¿Querés banear a **${user.tag}**? Esta acción expulsará al usuario del servidor.`,
+      confirmLabel: 'Banear',
+      cancelLabel: 'Cancelar',
+      onConfirm: async () => {
+        try {
+          await interaction.guild.members.ban(user, { reason });
+          const embed = successEmbed(config, '🔨 Usuario Baneado')
+            .setDescription(`**${user.tag}** ha sido baneado del servidor.`)
+            .addFields({ name: '📝 Razón', value: reason, inline: false });
 
-      await interaction.reply({ embeds: [embed] });
+          await interaction.followUp({ embeds: [embed], ephemeral: true });
 
-      const logEmbed = createAuditEmbed('ban', {
-        description: `**${user.tag}** fue baneado por **${interaction.user.tag}**.`,
-        target: `${user.tag} (${user.id})`,
-        moderator: `${interaction.user.tag} (${interaction.user.id})`,
-        reason
-      });
-      await sendLogMessage(interaction.guild, logEmbed);
-    } catch (error) {
-      console.error('Error al banear:', error);
-      await interaction.reply({ embeds: [errorEmbed(config, 'Ocurrió un error al intentar banear al usuario.')], ephemeral: true });
-    }
+          const logEmbed = createAuditEmbed('ban', {
+            description: `**${user.tag}** fue baneado por **${interaction.user.tag}**.`,
+            target: `${user.tag} (${user.id})`,
+            moderator: `${interaction.user.tag} (${interaction.user.id})`,
+            reason
+          });
+          await sendLogMessage(interaction.guild, logEmbed);
+        } catch (error) {
+          console.error('Error al banear:', error);
+          await interaction.followUp({ embeds: [errorEmbed(config, 'Ocurrió un error al intentar banear al usuario.')], ephemeral: true });
+        }
+      }
+    });
   }
 };

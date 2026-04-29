@@ -3,6 +3,7 @@ import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const unbanCommand = {
+  permissions: ['BanMembers'],
   data: new SlashCommandBuilder()
     .setName('unban')
     .setDescription('Quita el baneo a un usuario del servidor.')

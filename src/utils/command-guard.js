@@ -2,6 +2,17 @@ import { PermissionFlagsBits } from 'discord.js';
 import { errorEmbed } from '../commands/helpers.js';
 import { getCooldownRemaining, isOnCooldown, setCooldown } from './cooldowns.js';
 
+const PERMISSION_LABELS = {
+  BanMembers: 'Banear Miembros',
+  KickMembers: 'Expulsar Miembros',
+  ModerateMembers: 'Silenciar Miembros',
+  ManageMessages: 'Gestionar Mensajes',
+  ManageChannels: 'Gestionar Canales',
+  ManageGuild: 'Gestionar Servidor',
+  Administrator: 'Administrador',
+  ManageRoles: 'Gestionar Roles'
+};
+
 export async function validateCommandExecution({ interaction, command, config }) {
   const cooldown = typeof command.cooldown === 'number' ? command.cooldown * 1000 : config.defaultCooldown * 1000;
   const guildId = interaction.guild?.id;
@@ -14,7 +25,8 @@ export async function validateCommandExecution({ interaction, command, config })
   if (command.permissions?.length) {
     const missing = command.permissions.filter(permission => !interaction.member?.permissions.has(PermissionFlagsBits[permission]));
     if (missing.length > 0) {
-      return { allowed: false, reply: { embeds: [errorEmbed(config, `Necesitás el permiso \`${missing[0]}\` para usar este comando.`)], ephemeral: true } };
+      const permissionLabel = PERMISSION_LABELS[missing[0]] ?? missing[0];
+      return { allowed: false, reply: { embeds: [errorEmbed(config, `Necesitás el permiso \`${permissionLabel}\` para usar este comando.`)], ephemeral: true } };
     }
   }
 

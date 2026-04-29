@@ -1,10 +1,25 @@
-﻿import { SlashCommandBuilder } from 'discord.js';
+﻿import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { buildEmbed, successEmbed, errorEmbed } from './helpers.js';
 
 const activeReminders = new Map();
 
 function getReminderKey(interaction) {
   return `${interaction.guild?.id ?? 'DM'}:${interaction.channel?.id}:${interaction.user.id}`;
+}
+
+function buildReminderEmbed(config, interaction, message, sentCount, times) {
+  const progress = times > 0 ? ` (${sentCount + 1}/${times})` : '';
+
+  return new EmbedBuilder()
+    .setColor(config?.color ?? 0x5865F2)
+    .setTitle('🔔 Recordatorio')
+    .setDescription(message)
+    .setAuthor({
+      name: interaction.user.displayName ?? interaction.user.username,
+      iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+    })
+    .setFooter({ text: `Recordatorio${progress}` })
+    .setTimestamp();
 }
 
 export const setrecordatorioCommand = {
@@ -74,7 +89,10 @@ export const setrecordatorioCommand = {
       }
 
       try {
-        await channel.send({ content: `🔔 <@${interaction.user.id}> recordatorio: ${message}` });
+        await channel.send({
+          content: `<@${interaction.user.id}>`,
+          embeds: [buildReminderEmbed(config, interaction, message, sentCount, times)],
+        });
         sentCount += 1;
 
         if (times > 0 && sentCount >= times) {

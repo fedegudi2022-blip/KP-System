@@ -1,10 +1,13 @@
 import 'dotenv/config';
 import { ActivityType, Client, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { slashCommands } from './commands/index.js';
-import { categorizeHelpEntries, buildEmbed } from './commands/helpers.js';
-import { helpEntries } from './commands/help-entries.js';
+import { buildEmbed } from './commands/helpers.js';
 import { config } from './config.js';
 import { createAuditEmbed, sendLogMessage } from './logging.js';
+import { initializeDatabase } from './storage/database.js';
+import { validateCommandExecution } from './utils/command-guard.js';
+import { handleAutomodMessage } from './utils/automod.js';
+import { handleHelpInteraction } from './commands/ayuda.js';
 
 // ─── Validación del token ─────────────────────────────────────────────────────
 
@@ -168,6 +171,15 @@ client.once(Events.ClientReady, async (readyClient) => {
 // ─── Evento: InteractionCreate ────────────────────────────────────────────────
 
 client.on(Events.InteractionCreate, async (interaction) => {
+  if (interaction.isButton() && interaction.customId.startsWith('help_')) {
+    try {
+      await handleHelpInteraction({ interaction, config, client });
+    } catch (error) {
+      console.error('[ERROR] Help button interaction:', error);
+    }
+    return;
+  }
+
   if (!interaction.isChatInputCommand()) return;
 
   const command = slashCommands.find(cmd => cmd.data.name === interaction.commandName);
@@ -177,6 +189,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 
   try {
+    const validation = await validateCommandExecution({ interaction, command, config });
+    if (!validation.allowed) {
+      return await interaction.reply(validation.reply);
+    }
+
     console.log(`[CMD] ▶️ Ejecutando: /${interaction.commandName} por ${interaction.user.tag}`);
     
     await command.execute({
@@ -209,6 +226,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
     } catch (replyError) {
       console.error('[ERROR] No se pudo enviar el mensaje de error:', replyError);
     }
+  }
+});
+
+client.on(Events.MessageCreate, async (message) => {
+  try {
+    await handleAutomodMessage(message, config);
+  } catch (error) {
+    console.error('[AUTOMOD] Error al procesar mensaje:', error);
   }
 });
 
@@ -247,6 +272,17 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-// ─── Login ────────────────────────────────────────────────────────────────────
+// ─── Inicio del bot ────────────────────────────────────────────────────────
 
-client.login(token);
+async function startBot() {
+  try {
+    await initializeDatabase();
+    console.log('[DB] ✅ Base de datos inicializada');
+    await client.login(token);
+  } catch (error) {
+    console.error('[ERROR] No se pudo iniciar el bot:', error);
+    process.exit(1);
+  }
+}
+
+startBot();

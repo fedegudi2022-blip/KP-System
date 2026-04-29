@@ -3,6 +3,8 @@ import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const muteCommand = {
+  cooldown: 8,
+  permissions: ['ModerateMembers'],
   data: new SlashCommandBuilder()
     .setName('mute')
     .setDescription('Silencia a un usuario por tiempo limitado.')

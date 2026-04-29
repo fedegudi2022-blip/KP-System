@@ -3,6 +3,8 @@ import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const unmuteCommand = {
+  cooldown: 8,
+  permissions: ['ModerateMembers'],
   data: new SlashCommandBuilder()
     .setName('unmute')
     .setDescription('Quita el silencio a un usuario.')

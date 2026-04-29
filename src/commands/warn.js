@@ -6,6 +6,8 @@ import { createAuditEmbed, sendLogMessage } from '../logging.js';
 const AUTO_MUTE_THRESHOLD = 3;
 
 export const warnCommand = {
+  cooldown: 8,
+  permissions: ['ModerateMembers'],
   data: new SlashCommandBuilder()
     .setName('warn')
     .setDescription('Avisa a un usuario y registra una infracción.')

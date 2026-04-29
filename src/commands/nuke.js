@@ -2,6 +2,8 @@ import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
 
 export const nukeCommand = {
+  cooldown: 30,
+  permissions: ['Administrator'],
   data: new SlashCommandBuilder()
     .setName('nuke')
     .setDescription('Borra TODOS los mensajes del canal (EXTREMADAMENTE PELIGROSO).'),

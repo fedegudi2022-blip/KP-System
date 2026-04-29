@@ -21,7 +21,7 @@ export function createAuditEmbed(type, options = {}) {
     .setTitle(`${template.emoji} ${template.title}`)
     .setColor(template.color)
     .setTimestamp()
-    .setFooter({ text: 'Registro de eventos' });
+    .setFooter({ text: options.footerText ?? config.footerText ?? 'Registro de eventos' });
 
   if (options.author) {
     embed.setAuthor({ name: options.author, iconURL: options.authorIcon });
@@ -46,10 +46,18 @@ export async function sendLogMessage(guild, embed) {
   if (!channelId) return;
 
   const channel = guild.channels.cache.get(channelId) ?? await guild.channels.fetch(channelId).catch(() => null);
-  if (!channel || !channel.isTextBased()) return;
+  let targetChannel = channel;
+  if (!targetChannel || !targetChannel.isTextBased()) {
+    targetChannel = guild.systemChannel?.isTextBased() ? guild.systemChannel : null;
+  }
+
+  if (!targetChannel) {
+    console.warn('[LOG] No hay canal de logs configurado o válido. Revisa setlog.');
+    return;
+  }
 
   try {
-    await channel.send({ embeds: [embed] });
+    await targetChannel.send({ embeds: [embed] });
   } catch (error) {
     console.error('[LOG] No se pudo enviar el mensaje de log:', error);
   }

@@ -13,5 +13,8 @@ pnpm-debug.log*
 # System files
 .DS_Store
 
+# Base de datos local
+data/*.sqlite
+
 # VS Code settings
 .vscode/

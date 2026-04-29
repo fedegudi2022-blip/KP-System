@@ -3,6 +3,8 @@ import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const kickCommand = {
+  cooldown: 8,
+  permissions: ['KickMembers'],
   data: new SlashCommandBuilder()
     .setName('kick')
     .setDescription('Expulsa a un usuario del servidor.')

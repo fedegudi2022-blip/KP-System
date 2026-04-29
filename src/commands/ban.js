@@ -3,6 +3,8 @@ import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const banCommand = {
+  cooldown: 8,
+  permissions: ['BanMembers'],
   data: new SlashCommandBuilder()
     .setName('ban')
     .setDescription('Banea a un usuario del servidor.')

@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from 'discord.js';
 import { sanitizeText } from './helpers.js';
 
 export const decirCommand = {
+  cooldown: 7,
   data: new SlashCommandBuilder()
     .setName('decir')
     .setDescription('Hace que el bot diga un mensaje.')

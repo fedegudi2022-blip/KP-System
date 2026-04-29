@@ -4,6 +4,8 @@ import { clearWarns, getWarns } from '../storage/warns.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const clearwarnsCommand = {
+  cooldown: 10,
+  permissions: ['ModerateMembers'],
   data: new SlashCommandBuilder()
     .setName('clearwarns')
     .setDescription('Elimina todas las advertencias de un usuario.')

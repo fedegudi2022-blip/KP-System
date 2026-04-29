@@ -14,11 +14,26 @@ export const config = {
 
   // Actividades del bot (se rotan automáticamente)
   activities: [
-    { text: process.env.BOT_STATUS ?? '/ayuda (con)', type: 'Listening' },
+    { text: process.env.BOT_STATUS ?? '/ayuda (conoceme)', type: 'Listening' },
     { text: 'Viendo los mensajes!', type: 'Watching' },
     { text: '/ping (para ver mi latencia)', type: 'Listening' },
   ],
 
   // Cada cuántos ms rotar la actividad (5 minutos)
   activityInterval: 5 * 60 * 1000,
+
+  defaultCooldown: Number(process.env.DEFAULT_COOLDOWN ?? 5),
+
+  automod: {
+    enabled: true,
+    bannedWords: ['idiota', 'imbecil', 'boludo', 'tonto'],
+    inviteProtection: true,
+    suspiciousAttachmentProtection: true,
+    mentionProtection: true,
+    mentionThreshold: 6,
+    mentionTimeoutMinutes: 30,
+    newMemberProtectionDays: 7,
+    spamThreshold: 5,
+    spamInterval: 8 * 1000
+  }
 };

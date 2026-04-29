@@ -4,7 +4,7 @@ import { buildEmbed } from '../commands/helpers.js';
 import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 const INVITE_REGEX = /(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com\/invite)\/[A-Za-z0-9-]+/i;
-const URL_REGEX = /https?:\/\/[\S]+/i;
+const URL_REGEX = /https?:\/\/[^\s]+/i;
 const recentMessageMap = new Map();
 
 function isModerator(member) {
@@ -14,8 +14,7 @@ function isModerator(member) {
 function normalizeMessage(text) {
   return text
     .toLowerCase()
-    .replace(/[^
-\p{L}\p{N}\s]/gu, ' ')
+    .replace(/[^A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -23,9 +22,9 @@ function normalizeMessage(text) {
 function cleanupRecentMessages() {
   const now = Date.now();
   for (const [key, entries] of recentMessageMap.entries()) {
-    const activeEntries = entries.filter(entry => now - entry.timestamp < 60 * 1000);
-    if (activeEntries.length > 0) {
-      recentMessageMap.set(key, activeEntries);
+    const filtered = entries.filter(entry => now - entry.timestamp < 60 * 1000);
+    if (filtered.length > 0) {
+      recentMessageMap.set(key, filtered);
     } else {
       recentMessageMap.delete(key);
     }
@@ -38,8 +37,7 @@ function addRecentMessage(message, normalized, config) {
   const entries = recentMessageMap.get(key) ?? [];
 
   entries.push({ normalized, timestamp: now });
-  const windowMs = config.automod.repeatMessageWindowMs ?? 15 * 1000;
-  const activeEntries = entries.filter(entry => now - entry.timestamp < windowMs);
+  const activeEntries = entries.filter(entry => now - entry.timestamp < (config.automod.spamInterval ?? 8000));
   recentMessageMap.set(key, activeEntries);
 
   return activeEntries;
@@ -91,18 +89,20 @@ async function deleteRecentUserMessages(guild, userId) {
 export async function handleAutomodMessage(message, config) {
   if (!config.automod.enabled) return;
   if (!message.guild || message.author.bot || !message.content) return;
-  if (!message.channel?.isTextBased()) return;
 
   const member = message.member ?? await message.guild.members.fetch(message.author.id).catch(() => null);
   if (!member || isModerator(member)) return;
 
   const normalized = normalizeMessage(message.content);
-  const hasInvite = INVITE_REGEX.test(normalized);
+
+  const hasInvite = INVITE_REGEX.test(message.content);
   const hasExternalLink = URL_REGEX.test(message.content) && !hasInvite;
-  const hasBannedWord = config.automod.bannedWords.some(word => normalized.includes(word.toLowerCase()));
+
+  const hasBannedWord = config.automod.bannedWords.some(word => normalized.includes(word));
   const hasAttachment = message.attachments.size > 0;
-  const mentionsCount = message.mentions.users.size + message.mentions.roles.size + (message.mentions.everyone ? 5 : 0);
-  const isNewMember = config.automod.newMemberProtectionDays > 0 && member.joinedTimestamp
+  const mentionsCount = (message.mentions.users.size + message.mentions.roles.size) + (message.mentions.everyone ? 5 : 0);
+  const isNewMember = config.automod.newMemberProtectionDays > 0
+    && member.joinedTimestamp
     && (Date.now() - member.joinedTimestamp) < config.automod.newMemberProtectionDays * 24 * 60 * 60 * 1000;
 
   cleanupRecentMessages();
@@ -112,70 +112,48 @@ export async function handleAutomodMessage(message, config) {
   const isRepeatSpam = repeatedCount >= (config.automod.repeatMessageThreshold ?? 3);
 
   let reason = null;
+  let autoMute = false;
   let purgeAcrossChannels = false;
 
   if (mentionsCount >= (config.automod.mentionThreshold ?? 6) && config.automod.mentionProtection) {
-    reason = 'Uso excesivo de menciones';
-    purgeAcrossChannels = true;
-  } else if (hasInvite && config.automod.inviteProtection) {
-    reason = 'Enlace de invitación de Discord no permitido';
-  } else if (hasBannedWord) {
-    reason = 'Uso de lenguaje inapropiado';
-  } else if (isRepeatSpam) {
-    reason = 'Repetición de mensajes detectada';
-  } else if (isSpam) {
-    reason = 'Envío excesivo de mensajes seguidos';
-  } else if (hasAttachment && config.automod.suspiciousAttachmentProtection && (hasExternalLink || hasInvite || hasBannedWord || isNewMember)) {
-    reason = 'Envío de archivos o enlaces sospechosos';
-  } else if (hasExternalLink && config.automod.inviteProtection) {
-    reason = 'Enlace externo sospechoso';
+    if (config.automod.mentionAction === 'warn') {
+      reason = 'Demasiadas menciones';
+      autoMute = true;
+    } else {
+      reason = 'Spam de menciones';
+      purgeAcrossChannels = true;
+    }
+  }
+
+  if (hasExternalLink && config.automod.linkProtection) {
+    reason = 'Enlace externo no permitido';
+  }
+
+  if (hasBannedWord && config.automod.wordProtection) {
+    reason = 'Palabra prohibida detectada';
+  }
+
+  if ((isSpam || isRepeatSpam) && config.automod.spamProtection) {
+    reason = 'Mensajes repetidos o spam detectado';
+  }
+
+  if (isNewMember && config.automod.newMemberProtection) {
+    reason = 'Usuario nuevo con restricción de mensajes';
   }
 
   if (!reason) return;
 
-  await message.delete().catch(() => null);
+  const warnCount = await addWarn(message.guild.id, message.author.id, message.author.tag, reason);
+  const action = await applyAutoSanctions(message.member ?? message.author, message.guild, warnCount, config, reason);
 
-  let deletedCount = 0;
-  if (purgeAcrossChannels) {
-    deletedCount = await deleteRecentUserMessages(message.guild, message.author.id);
-  }
-
-  const warn = await addWarn(message.guild.id, message.author.id, message.client.user.id, `Auto-moderación: ${reason}`);
-  const warns = await getWarns(message.guild.id, message.author.id);
-  const sanction = await applyAutoSanctions(member, message.guild, warns.length, config, `Auto-moderación: ${reason}`);
-
-  const logFields = [
-    { name: 'Canal', value: `${message.channel}`, inline: true },
-    { name: 'Warn ID', value: warn.id, inline: true },
-    { name: 'Advertencias totales', value: `${warns.length}`, inline: true }
-  ];
+  await sendLogMessage(message.guild, createAuditEmbed({
+    author: message.author,
+    title: 'Automoderación aplicada',
+    description: `Acción: ${action ?? 'warning'}\nMotivo: ${reason}`,
+    color: 'ORANGE',
+  }));
 
   if (purgeAcrossChannels) {
-    logFields.push({ name: 'Mensajes purgados', value: `${deletedCount}`, inline: true });
+    await deleteRecentUserMessages(message.guild, message.author.id);
   }
-
-  if (sanction === 'mute') {
-    logFields.push({ name: 'Acción', value: 'Silenciado automáticamente', inline: true });
-  } else if (sanction === 'kick') {
-    logFields.push({ name: 'Acción', value: 'Expulsado automáticamente', inline: true });
-  } else if (sanction === 'ban') {
-    logFields.push({ name: 'Acción', value: 'Baneado automáticamente', inline: true });
-  }
-
-  const logEmbed = createAuditEmbed('warn', {
-    description: `Se eliminó un mensaje de **${message.author.tag}** por auto-moderación.`,
-    target: `${message.author.tag} (${message.author.id})`,
-    moderator: `${message.client.user.tag}`,
-    reason,
-    fields: logFields
-  });
-  await sendLogMessage(message.guild, logEmbed);
-
-  const responseText = sanction
-    ? `Se eliminó un mensaje por: **${reason}**. Se aplicó una sanción automática adicional: **${sanction}**.`
-    : `Se eliminó un mensaje por: **${reason}**. Si se repite, se aplicarán sanciones automáticas.`;
-
-  const responseEmbed = buildEmbed(config, '🛡️ Moderación automática', responseText);
-  const reply = await message.channel.send({ embeds: [responseEmbed] });
-  setTimeout(() => reply.delete().catch(() => null), 9_000);
 }

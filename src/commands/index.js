@@ -23,6 +23,9 @@ import { decirCommand } from './decir.js';
 import { embedCommand } from './embed.js';
 import { pollCommand } from './poll.js';
 import { setrecordatorioCommand } from './setrecordatorio.js';
+import { listRecordatoriosCommand } from './listrecordatorios.js';
+import { recordatorioInfoCommand } from './recordatorioinfo.js';
+import { cancelarRecordatorioCommand } from './cancelarrecordatorio.js';
 import { nukeCommand } from './nuke.js';
 import { setlogCommand } from './setlog.js';
 import { unbanCommand } from './unban.js';
@@ -40,6 +43,9 @@ export const slashCommands = [
   embedCommand,
   pollCommand,
   setrecordatorioCommand,
+  listRecordatoriosCommand,
+  recordatorioInfoCommand,
+  cancelarRecordatorioCommand,
   limpiarCommand,
   banCommand,
   unbanCommand,

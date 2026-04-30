@@ -49,4 +49,18 @@ export async function initializeDatabase() {
     guild_id TEXT PRIMARY KEY,
     channel_id TEXT NOT NULL
   );`);
+
+  await run(`CREATE TABLE IF NOT EXISTS reminder (
+    id TEXT PRIMARY KEY,
+    guild_id TEXT NOT NULL,
+    channel_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    message TEXT NOT NULL,
+    minutes INTEGER NOT NULL,
+    times INTEGER NOT NULL DEFAULT 0,
+    sent_count INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    last_sent TEXT,
+    UNIQUE(guild_id, channel_id, user_id)
+  );`);
 }

@@ -3,8 +3,8 @@ import { buildEmbed } from './helpers.js';
 
 export const pingCommand = {
   data: new SlashCommandBuilder()
-    .setName('ping')
-    .setDescription('Mide la latencia del bot y API de Discord.'),
+    .setName('latencia')
+    .setDescription('Mide la latencia del bot y la API de Discord.'),
 
   async execute({ interaction, config, client }) {
     const initial = await interaction.reply({

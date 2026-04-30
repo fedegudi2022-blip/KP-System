@@ -7,7 +7,7 @@ export const clearwarnsCommand = {
   cooldown: 10,
   permissions: ['ModerateMembers'],
   data: new SlashCommandBuilder()
-    .setName('clearwarns')
+    .setName('limpiaradvertencias')
     .setDescription('Elimina todas las advertencias de un usuario.')
     .addUserOption(opt =>
       opt.setName('usuario')

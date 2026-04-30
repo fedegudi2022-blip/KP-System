@@ -9,7 +9,7 @@ export const warnCommand = {
   cooldown: 8,
   permissions: ['ModerateMembers'],
   data: new SlashCommandBuilder()
-    .setName('warn')
+    .setName('advertir')
     .setDescription('Avisa a un usuario y registra una infracción.')
     .addUserOption(opt =>
       opt.setName('usuario')

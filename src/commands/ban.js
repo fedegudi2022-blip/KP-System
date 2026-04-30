@@ -5,9 +5,11 @@ import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const banCommand = {
   cooldown: 8,
+  requireGuild: true,
   permissions: ['BanMembers'],
+  botPermissions: ['BanMembers'],
   data: new SlashCommandBuilder()
-    .setName('ban')
+    .setName('banear')
     .setDescription('Banea a un usuario del servidor.')
     .addUserOption(opt =>
       opt.setName('usuario')
@@ -75,6 +77,7 @@ export const banCommand = {
             description: `**${user.tag}** fue baneado por **${interaction.user.tag}**.`,
             target: `${user.tag} (${user.id})`,
             moderator: `${interaction.user.tag} (${interaction.user.id})`,
+            channel: `<#${interaction.channelId}>`,
             reason
           });
           await sendLogMessage(interaction.guild, logEmbed);

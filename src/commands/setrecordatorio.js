@@ -1,28 +1,11 @@
-﻿import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { buildEmbed, successEmbed, errorEmbed } from './helpers.js';
-
-const activeReminders = new Map();
-
-function getReminderKey(interaction) {
-  return `${interaction.guild?.id ?? 'DM'}:${interaction.channel?.id}:${interaction.user.id}`;
-}
-
-function buildReminderEmbed(config, interaction, message, sentCount, times) {
-  const progress = times > 0 ? ` (${sentCount + 1}/${times})` : '';
-
-  return new EmbedBuilder()
-    .setColor(config?.color ?? 0x5865F2)
-    .setTitle('🔔 Recordatorio')
-    .setDescription(message)
-    .setAuthor({
-      name: interaction.user.displayName ?? interaction.user.username,
-      iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-    })
-    .setFooter({ text: `Recordatorio${progress}` })
-    .setTimestamp();
-}
+﻿import { SlashCommandBuilder } from 'discord.js';
+import { successEmbed, errorEmbed } from './helpers.js';
+import { createReminder, deleteReminderByContext, getReminderForUserChannel } from '../storage/reminders.js';
+import { clearActiveReminderByKey, scheduleReminder } from '../utils/reminder-manager.js';
 
 export const setrecordatorioCommand = {
+  cooldown: 8,
+  requireGuild: true,
   data: new SlashCommandBuilder()
     .setName('setrecordatorio')
     .setDescription('Configura un recordatorio periódico que se envía en este canal.')
@@ -50,62 +33,50 @@ export const setrecordatorioCommand = {
     const times = interaction.options.getInteger('veces') ?? 0;
     const message = interaction.options.getString('mensaje')?.trim();
     const channel = interaction.channel;
-    const key = getReminderKey(interaction);
+    const guild = interaction.guild;
 
     if (!message) {
       await interaction.reply({ embeds: [errorEmbed(config, 'El mensaje no puede quedar vacío.')], ephemeral: true });
       return;
     }
 
-    if (!channel || !channel.isTextBased()) {
+    if (!channel || !channel.isTextBased() || !guild) {
       await interaction.reply({ embeds: [errorEmbed(config, 'No se puede programar recordatorios en este canal.')], ephemeral: true });
       return;
     }
 
-    if (activeReminders.has(key)) {
-      const previous = activeReminders.get(key);
-      clearInterval(previous.intervalId);
-      activeReminders.delete(key);
+    const existingReminder = await getReminderForUserChannel(guild.id, channel.id, interaction.user.id);
+    if (existingReminder) {
+      clearActiveReminderByKey(guild.id, channel.id, interaction.user.id);
+      await deleteReminderByContext(guild.id, channel.id, interaction.user.id);
     }
+
+    const reminder = {
+      id: `rem-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      guildId: guild.id,
+      channelId: channel.id,
+      userId: interaction.user.id,
+      message,
+      minutes,
+      times,
+      sentCount: 0,
+      createdAt: new Date().toISOString(),
+      lastSent: null
+    };
+
+    await createReminder(reminder);
+    await scheduleReminder(reminder, channel, config);
 
     await interaction.reply({
       embeds: [
         successEmbed(
           config,
           '✅ Recordatorio configurado',
-          `Enviaré tu mensaje cada **${minutes}** minuto${minutes === 1 ? '' : 's'} en este canal` +
+          `Enviaré tu recordatorio cada **${minutes}** minuto${minutes === 1 ? '' : 's'} en este canal` +
           (times > 0 ? ` un total de **${times}** veces.` : ' hasta que el bot se reinicie.')
         )
       ],
       ephemeral: true
     });
-
-    let sentCount = 0;
-    const intervalId = setInterval(async () => {
-      if (times > 0 && sentCount >= times) {
-        clearInterval(intervalId);
-        activeReminders.delete(key);
-        return;
-      }
-
-      try {
-        await channel.send({
-          content: `<@${interaction.user.id}>`,
-          embeds: [buildReminderEmbed(config, interaction, message, sentCount, times)],
-        });
-        sentCount += 1;
-
-        if (times > 0 && sentCount >= times) {
-          clearInterval(intervalId);
-          activeReminders.delete(key);
-        }
-      } catch (error) {
-        console.error('Error al enviar recordatorio:', error);
-        clearInterval(intervalId);
-        activeReminders.delete(key);
-      }
-    }, minutes * 60_000);
-
-    activeReminders.set(key, { intervalId, message, minutes, times });
   }
 };

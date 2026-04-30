@@ -15,8 +15,8 @@ function createHelpEmbed(config, client, grouped, category) {
       { name: '📂 Categoría', value: category, inline: true }
     )
     .addFields(entries.slice(0, 10).map(entry => ({
-      name: entry.usage,
-      value: entry.description,
+      name: `> \`${entry.usage}\``,
+      value: `**${entry.description}**`,
       inline: false
     })));
 }

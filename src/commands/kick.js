@@ -5,9 +5,11 @@ import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const kickCommand = {
   cooldown: 8,
+  requireGuild: true,
   permissions: ['KickMembers'],
+  botPermissions: ['KickMembers'],
   data: new SlashCommandBuilder()
-    .setName('kick')
+    .setName('expulsar')
     .setDescription('Expulsa a un usuario del servidor.')
     .addUserOption(opt =>
       opt.setName('usuario')
@@ -80,6 +82,7 @@ export const kickCommand = {
             description: `**${user.tag}** fue expulsado por **${interaction.user.tag}**.`,
             target: `${user.tag} (${user.id})`,
             moderator: `${interaction.user.tag} (${interaction.user.id})`,
+            channel: `<#${interaction.channelId}>`,
             reason
           });
           await sendLogMessage(interaction.guild, logEmbed);

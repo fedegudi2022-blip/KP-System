@@ -1,12 +1,14 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { buildEmbed, errorEmbed, successEmbed } from './helpers.js';
 import { requestConfirmation } from '../utils/confirmations.js';
+import { createAuditEmbed, sendLogMessage } from '../logging.js';
 
 export const nukeCommand = {
   cooldown: 30,
+  requireGuild: true,
   permissions: ['Administrator'],
   data: new SlashCommandBuilder()
-    .setName('nuke')
+    .setName('borrartodo')
     .setDescription('Borra TODOS los mensajes del canal (EXTREMADAMENTE PELIGROSO).'),
 
   async execute({ interaction, config }) {
@@ -53,6 +55,16 @@ export const nukeCommand = {
           .setDescription(`Se eliminaron **${deleted}** mensajes del canal.`);
 
         await interaction.followUp({ embeds: [embed], ephemeral: true });
+
+        const logEmbed = createAuditEmbed('nuke', {
+          description: `Se ejecutó un nuke en el canal ${interaction.channel}.`,
+          moderator: `${interaction.user.tag} (${interaction.user.id})`,
+          channel: `<#${interaction.channel.id}>`,
+          fields: [
+            { name: 'Mensajes eliminados', value: `${deleted}`, inline: true }
+          ]
+        });
+        await sendLogMessage(interaction.guild, logEmbed);
       }
     });
   }

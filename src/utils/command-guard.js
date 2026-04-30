@@ -30,6 +30,24 @@ export async function validateCommandExecution({ interaction, command, config })
     }
   }
 
+  if (command.requiredRoles?.length && interaction.guild) {
+    const missingRoles = command.requiredRoles.filter(role =>
+      !interaction.member?.roles.cache.some(r => r.id === role || r.name === role)
+    );
+    if (missingRoles.length > 0) {
+      return { allowed: false, reply: { embeds: [errorEmbed(config, 'No tenés el rol requerido para usar este comando.')], ephemeral: true } };
+    }
+  }
+
+  if (command.botPermissions?.length && interaction.guild) {
+    const botMember = interaction.guild.members.me;
+    const missingBot = command.botPermissions.filter(permission => !botMember?.permissions.has(PermissionFlagsBits[permission]));
+    if (missingBot.length > 0) {
+      const permissionLabel = PERMISSION_LABELS[missingBot[0]] ?? missingBot[0];
+      return { allowed: false, reply: { embeds: [errorEmbed(config, `Necesito el permiso \`${permissionLabel}\` para ejecutar este comando.`)], ephemeral: true } };
+    }
+  }
+
   if (isOnCooldown(command.data.name, userId, guildId)) {
     const remaining = Math.ceil(getCooldownRemaining(command.data.name, userId, guildId) / 1000);
     return { allowed: false, reply: { embeds: [errorEmbed(config, `Espera **${remaining}** segundos antes de volver a usar este comando.`)], ephemeral: true } };

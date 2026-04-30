@@ -6,6 +6,7 @@ Proyecto de bot de Discord con comandos slash, base de datos SQLite, moderación
 
 - Registro automático de comandos slash
 - Validación de comandos antes del registro
+- Recordatorios persistentes en SQLite que se restauran tras reinicios
 - Persistencia con SQLite en `data/bot.sqlite`
 - Sistema de cooldowns y permisos centralizados
 - Logs auditables en canal configurable
@@ -17,38 +18,41 @@ Proyecto de bot de Discord con comandos slash, base de datos SQLite, moderación
 
 ### 🔧 Utiles
 - `/ayuda` - Muestra un panel organizado con botones
-- `/ping` - Mide la latencia del bot
+- `/latencia` - Mide la latencia del bot
 - `/hora` - Muestra la hora según la zona configurada
-- `/info` - Información general del bot
-- `/uptime` - Tiempo que lleva encendido el bot
+- `/informacion` - Información general del bot
+- `/tiempo` - Tiempo que lleva encendido el bot
 - `/servidor` - Información del servidor actual
 - `/usuario` - Información de un usuario
 - `/avatar` - Muestra el avatar de un usuario
 - `/calc` - Calculadora matemática
-- `/embed` - Envía un embed personalizado
-- `/poll` - Crea una encuesta rápida
-- `/setrecordatorio` - Configura recordatorios
+- `/crearembed` - Envía un embed personalizado
+- `/encuesta` - Crea una encuesta rápida
+- `/setrecordatorio` - Configura recordatorios persistentes
+- `/listrecordatorios` - Lista tus recordatorios activos
+- `/recordatorioinfo` - Muestra detalles de un recordatorio
+- `/cancelarrecordatorio` - Cancela un recordatorio activo
 
 ### 🛡️ Moderación
-- `/setlog` - Configura el canal de logs
-- `/warn` - Advierte a un usuario
-- `/infractions` - Muestra las infracciones de un usuario
-- `/clearwarns` - Limpia advertencias de un usuario
-- `/ban` - Banea a un usuario
-- `/kick` - Expulsa a un usuario
-- `/mute` - Silencia a un usuario
-- `/unmute` - Quita el silencio a un usuario
+- `/configlog` - Configura el canal de logs
+- `/advertir` - Advierte a un usuario
+- `/infracciones` - Muestra las infracciones de un usuario
+- `/limpiaradvertencias` - Limpia advertencias de un usuario
+- `/banear` - Banea a un usuario
+- `/expulsar` - Expulsa a un usuario
+- `/silenciar` - Silencia a un usuario
+- `/desilenciar` - Quita el silencio a un usuario
 
 ### 🎲 Diversión
 - `/dado` - Lanza un dado
 - `/moneda` - Lanza una moneda al aire
 - `/bola8` - Pregunta a la bola mágica
 - `/hola` - Saluda al bot
-- `/poll` - Crea una encuesta rápida
+- `/encuesta` - Crea una encuesta rápida
 
 ### 🚫 Peligrosos
 - `/decir` - Hace que el bot diga un mensaje
-- `/nuke` - Borra mensajes en el canal actual
+- `/borrartodo` - Borra mensajes en el canal actual
 
 ## Requisitos
 

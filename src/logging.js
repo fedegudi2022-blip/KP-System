@@ -41,6 +41,8 @@ export function createAuditEmbed(type, options = {}) {
   const fields = [];
   if (options.target) fields.push({ name: 'Usuario', value: options.target, inline: true });
   if (options.moderator) fields.push({ name: 'Moderador', value: options.moderator, inline: true });
+  if (options.channel) fields.push({ name: 'Canal', value: options.channel, inline: true });
+  if (options.messageLink) fields.push({ name: 'Mensaje', value: options.messageLink, inline: false });
   if (options.duration) fields.push({ name: 'Duración', value: options.duration, inline: true });
   if (options.reason) fields.push({ name: 'Razón', value: options.reason, inline: false });
   if (Array.isArray(options.fields)) fields.push(...options.fields);

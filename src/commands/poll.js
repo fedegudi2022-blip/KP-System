@@ -5,7 +5,7 @@ const EMOJIS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣'];
 
 export const pollCommand = {
   data: new SlashCommandBuilder()
-    .setName('poll')
+    .setName('encuesta')
     .setDescription('Crea una encuesta rápida con opciones.')
     .addStringOption(opt =>
       opt.setName('pregunta')

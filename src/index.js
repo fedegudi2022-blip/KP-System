@@ -9,6 +9,7 @@ import { validateCommandExecution } from './utils/command-guard.js';
 import { handleAutomodMessage } from './utils/automod.js';
 import { handleHelpInteraction } from './commands/ayuda.js';
 import { handleConfirmationInteraction } from './utils/confirmations.js';
+import { restoreReminders } from './utils/reminder-manager.js';
 
 // ─── Validación del token ─────────────────────────────────────────────────────
 
@@ -170,6 +171,10 @@ client.once(Events.ClientReady, async (readyClient) => {
 
   // Actividad inicial
   setNextActivity(readyClient.user, readyClient);
+
+  // Restaurar recordatorios persistentes
+  const restoredReminders = await restoreReminders(readyClient, config);
+  console.log(`[BOT] 🔁 Restaurados ${restoredReminders} recordatorios persistentes`);
 
   // Rotación de actividades
   setInterval(() => {

@@ -5,7 +5,7 @@ import { createAuditEmbed, sendLogMessage } from '../logging.js';
 export const unbanCommand = {
   permissions: ['BanMembers'],
   data: new SlashCommandBuilder()
-    .setName('unban')
+    .setName('desbanear')
     .setDescription('Quita el baneo a un usuario del servidor.')
     .addUserOption(opt =>
       opt.setName('usuario')

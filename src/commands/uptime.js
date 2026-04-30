@@ -4,7 +4,7 @@ import { formatDuration } from '../utils/time.js';
 
 export const uptimeCommand = {
   data: new SlashCommandBuilder()
-    .setName('uptime')
+    .setName('tiempo')
     .setDescription('Muestra cuánto tiempo lleva encendido el bot.'),
 
   async execute({ interaction, config, client }) {

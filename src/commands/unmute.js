@@ -6,7 +6,7 @@ export const unmuteCommand = {
   cooldown: 8,
   permissions: ['ModerateMembers'],
   data: new SlashCommandBuilder()
-    .setName('unmute')
+    .setName('desilenciar')
     .setDescription('Quita el silencio a un usuario.')
     .addUserOption(opt =>
       opt.setName('usuario')

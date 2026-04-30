@@ -7,10 +7,10 @@ export const helpEntries = [
     details: 'Abre esta guía rápida con los comandos mejor explicados y sus ejemplos.'
   },
   {
-    name: 'ping',
+    name: 'latencia',
     category: '🔧 Utiles',
     description: 'Mide la latencia del bot y la API de Discord.',
-    usage: '/ping',
+    usage: '/latencia',
     details: 'Útil para comprobar si el bot responde correctamente en el servidor.'
   },
   {
@@ -21,17 +21,17 @@ export const helpEntries = [
     details: 'Devuelve la hora local del bot con la zona horaria configurada.'
   },
   {
-    name: 'info',
+    name: 'informacion',
     category: '🔧 Utiles',
     description: 'Muestra estadísticas e información general del bot.',
-    usage: '/info',
-    details: 'Incluye servidores, usuarios, uptime, memoria y ping de API.'
+    usage: '/informacion',
+    details: 'Incluye servidores, usuarios, tiempo en línea, memoria y ping de API.'
   },
   {
-    name: 'uptime',
+    name: 'tiempo',
     category: '🔧 Utiles',
     description: 'Muestra cuánto tiempo lleva el bot en línea.',
-    usage: '/uptime',
+    usage: '/tiempo',
     details: 'Excelente para comprobar si hubo reinicios recientes.'
   },
   {
@@ -63,45 +63,45 @@ export const helpEntries = [
     details: 'Soporta + - * / % ^ y paréntesis para cálculos rápidos.'
   },
   {
-    name: 'embed',
+    name: 'crearembed',
     category: '🔧 Utiles',
     description: 'Crea mensajes embed con título, URL, descripción y más.',
-    usage: '/embed <titulo> [url] [subtitulo] [color] [pie] [imagen] [miniatura]',
+    usage: '/crearembed <titulo> [url] [subtitulo] [color] [pie] [imagen] [miniatura]',
     details: 'Genera un embed personalizado de forma rápida con opciones de formato.'
   },
   {
-    name: 'setlog',
+    name: 'configlog',
     category: '🛡️ Moderación',
     description: 'Configura el canal donde se envían los logs del servidor.',
-    usage: '/setlog <canal>',
-    details: 'Permite elegir un solo canal de logs para baneos, kicks, mutes y entradas/salidas.'
+    usage: '/configlog <canal>',
+    details: 'Permite elegir un solo canal de logs para baneos, expulsiones, silencios y entradas/salidas.'
   },
   {
-    name: 'warn',
+    name: 'advertir',
     category: '🛡️ Moderación',
     description: 'Registra una advertencia a un usuario.',
-    usage: '/warn <usuario> <razon>',
+    usage: '/advertir <usuario> <razon>',
     details: 'Registra una infracción persistente y puede silenciar automáticamente después de varias advertencias.'
   },
   {
-    name: 'infractions',
+    name: 'infracciones',
     category: '🛡️ Moderación',
     description: 'Muestra las infracciones de un usuario.',
-    usage: '/infractions [usuario]',
+    usage: '/infracciones [usuario]',
     details: 'Lista las advertencias almacenadas para un usuario en este servidor.'
   },
   {
-    name: 'clearwarns',
+    name: 'limpiaradvertencias',
     category: '🛡️ Moderación',
     description: 'Elimina todas las advertencias de un usuario.',
-    usage: '/clearwarns <usuario>',
+    usage: '/limpiaradvertencias <usuario>',
     details: 'Limpia las advertencias persistentes registradas para ese usuario.'
   },
   {
-    name: 'unban',
+    name: 'desbanear',
     category: '🛡️ Moderación',
     description: 'Quita el baneo a un usuario del servidor.',
-    usage: '/unban <usuario> [razon]',
+    usage: '/desbanear <usuario> [razon]',
     details: 'Requiere permiso de Ban Members y registra la acción en el canal de logs.'
   },
   {
@@ -112,31 +112,31 @@ export const helpEntries = [
     details: 'Requiere permiso de Manage Messages y borra hasta 100 mensajes.'
   },
   {
-    name: 'ban',
+    name: 'banear',
     category: '🛡️ Moderación',
     description: 'Banea a un usuario del servidor.',
-    usage: '/ban <usuario> [razon]',
+    usage: '/banear <usuario> [razon]',
     details: 'Requiere permiso de Ban Members y protege contra autobaneo.'
   },
   {
-    name: 'kick',
+    name: 'expulsar',
     category: '🛡️ Moderación',
     description: 'Expulsa a un usuario del servidor.',
-    usage: '/kick <usuario> [razon]',
+    usage: '/expulsar <usuario> [razon]',
     details: 'Requiere permiso de Kick Members y verifica que el usuario esté expulsable.'
   },
   {
-    name: 'mute',
+    name: 'silenciar',
     category: '🛡️ Moderación',
     description: 'Silencia a un usuario por un tiempo limitado.',
-    usage: '/mute <usuario> <minutos> [razon]',
+    usage: '/silenciar <usuario> <minutos> [razon]',
     details: 'Requiere permiso de Moderate Members y aplica timeout al usuario.'
   },
   {
-    name: 'unmute',
+    name: 'desilenciar',
     category: '🛡️ Moderación',
     description: 'Quita el silencio a un usuario.',
-    usage: '/unmute <usuario>',
+    usage: '/desilenciar <usuario>',
     details: 'Requiere permiso de Moderate Members y verifica el estado de silencio.'
   },
   {
@@ -168,10 +168,10 @@ export const helpEntries = [
     details: 'El bot responde con saludos amigables y personalizados.'
   },
   {
-    name: 'poll',
+    name: 'encuesta',
     category: '🎲 Diversión',
     description: 'Crea una encuesta rápida con reacciones.',
-    usage: '/poll <pregunta> <opcion1> <opcion2> [opcion3] [opcion4] [opcion5]',
+    usage: '/encuesta <pregunta> <opcion1> <opcion2> [opcion3] [opcion4] [opcion5]',
     details: 'El bot publica una encuesta y agrega reacciones numéricas para votar.'
   },
   {
@@ -182,6 +182,27 @@ export const helpEntries = [
     details: 'El bot repetirá tu mensaje cada intervalo en el canal donde lo configures.'
   },
   {
+    name: 'listrecordatorios',
+    category: '🔧 Utiles',
+    description: 'Lista tus recordatorios activos en este servidor.',
+    usage: '/listrecordatorios',
+    details: 'Muestra los recordatorios activos de tu usuario en el servidor actual.'
+  },
+  {
+    name: 'recordatorioinfo',
+    category: '🔧 Utiles',
+    description: 'Muestra información detallada de un recordatorio activo.',
+    usage: '/recordatorioinfo [id]',
+    details: 'Permite ver el canal, intervalo, cantidad de envíos y mensaje del recordatorio.'
+  },
+  {
+    name: 'cancelarrecordatorio',
+    category: '🔧 Utiles',
+    description: 'Cancela un recordatorio activo.',
+    usage: '/cancelarrecordatorio [id]',
+    details: 'Elimina un recordatorio programado y detiene su envío en el canal.'
+  },
+  {
     name: 'decir',
     category: '🚫 Prohibido',
     description: 'Hace que el bot repita un mensaje.',
@@ -189,10 +210,10 @@ export const helpEntries = [
     details: 'Usar con cuidado: el bot envía el texto directamente por el canal.'
   },
   {
-    name: 'nuke',
+    name: 'borrartodo',
     category: '🚫 Prohibido',
     description: 'Borra todos los mensajes del canal.',
-    usage: '/nuke',
+    usage: '/borrartodo',
     details: 'Requiere Administrador y borra mensajes en bloques hasta vaciar el canal.'
   }
 ];

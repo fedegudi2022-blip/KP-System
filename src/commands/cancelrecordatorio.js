@@ -8,7 +8,7 @@ export const cancelarRecordatorioCommand = {
   cooldown: 6,
   requireGuild: true,
   data: new SlashCommandBuilder()
-    .setName('cancelarrecordatorio')
+    .setName('cancelrecordatorio')
     .setDescription('Cancela un recordatorio activo.')
     .addStringOption(opt =>
       opt.setName('id')

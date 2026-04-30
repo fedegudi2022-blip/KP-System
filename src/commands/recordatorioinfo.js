@@ -54,8 +54,7 @@ export const recordatorioInfoCommand = {
     }
 
     const remaining = reminder.times > 0 ? Math.max(reminder.times - reminder.sent_count, 0) : 'Indefinido';
-    const embed = infoEmbed(config, 'Detalle del recordatorio', `ID: 
-\\`${reminder.id}\`\n`)
+    const embed = infoEmbed(config, 'Detalle del recordatorio', `ID: \`${reminder.id}\`\n`)
       .addFields(
         { name: 'Canal', value: `<#${reminder.channel_id}>`, inline: true },
         { name: 'Intervalo', value: `${reminder.minutes} min`, inline: true },

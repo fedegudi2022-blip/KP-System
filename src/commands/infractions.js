@@ -4,7 +4,7 @@ import { getWarns } from '../storage/warns.js';
 
 export const infractionsCommand = {
   data: new SlashCommandBuilder()
-    .setName('infracciones')
+    .setName('infractions')
     .setDescription('Muestra las infracciones de un usuario.')
     .addUserOption(opt =>
       opt.setName('usuario')

@@ -7,7 +7,7 @@ export const muteCommand = {
   cooldown: 8,
   permissions: ['ModerateMembers'],
   data: new SlashCommandBuilder()
-    .setName('silenciar')
+    .setName('mute')
     .setDescription('Silencia a un usuario por tiempo limitado.')
     .addUserOption(opt =>
       opt.setName('usuario')

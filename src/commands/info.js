@@ -4,7 +4,7 @@ import { formatDuration } from '../utils/time.js';
 
 export const infoCommand = {
   data: new SlashCommandBuilder()
-    .setName('informacion')
+    .setName('info')
     .setDescription('Muestra información general del bot.'),
 
   async execute({ interaction, config, client }) {

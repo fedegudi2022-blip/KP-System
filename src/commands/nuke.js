@@ -8,7 +8,7 @@ export const nukeCommand = {
   requireGuild: true,
   permissions: ['Administrator'],
   data: new SlashCommandBuilder()
-    .setName('borrartodo')
+    .setName('nuke')
     .setDescription('Borra TODOS los mensajes del canal (EXTREMADAMENTE PELIGROSO).'),
 
   async execute({ interaction, config }) {

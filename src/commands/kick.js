@@ -9,7 +9,7 @@ export const kickCommand = {
   permissions: ['KickMembers'],
   botPermissions: ['KickMembers'],
   data: new SlashCommandBuilder()
-    .setName('expulsar')
+    .setName('kick')
     .setDescription('Expulsa a un usuario del servidor.')
     .addUserOption(opt =>
       opt.setName('usuario')

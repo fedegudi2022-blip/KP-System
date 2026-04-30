@@ -9,7 +9,7 @@ export const banCommand = {
   permissions: ['BanMembers'],
   botPermissions: ['BanMembers'],
   data: new SlashCommandBuilder()
-    .setName('banear')
+    .setName('ban')
     .setDescription('Banea a un usuario del servidor.')
     .addUserOption(opt =>
       opt.setName('usuario')

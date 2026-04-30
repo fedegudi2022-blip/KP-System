@@ -3,7 +3,7 @@ import { errorEmbed, isValidUrl, sanitizeText } from './helpers.js';
 
 export const embedCommand = {
   data: new SlashCommandBuilder()
-    .setName('crearembed')
+    .setName('embed')
     .setDescription('Crea un mensaje embed con opciones personalizadas.')
     .addStringOption(opt =>
       opt.setName('titulo')

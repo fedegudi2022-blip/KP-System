@@ -6,7 +6,7 @@ import { createAuditEmbed, sendLogMessage } from '../logging.js';
 export const setlogCommand = {
   permissions: ['ManageGuild'],
   data: new SlashCommandBuilder()
-    .setName('configlog')
+    .setName('setlog')
     .setDescription('Configura el canal donde se enviarán los logs del servidor.')
     .addChannelOption(opt =>
       opt.setName('canal')
